@@ -237,7 +237,7 @@ app.post('/api/analyze-results', async (req, res) => {
     console.log('Analyzing results for topic:', topic);
 
     // Initialize Gemini model
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+    const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
 
     const incorrectAnswers = results.filter(r => !r.isCorrect);
     const correctAnswersList = results.filter(r => r.isCorrect);
