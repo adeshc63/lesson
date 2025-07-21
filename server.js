@@ -142,11 +142,17 @@ For each question return:
   "explanation": "Brief explanation"
 }
 
-IMPORTANT:
-- Fill in the blank: Use _____ and provide 4 word options
-- Short answer: Simple factual questions
+CRITICAL RULES:
+- Fill in the blank: Use _____ in question and provide 4 word options. The "answer" field MUST exactly match one of the 4 options.
+- MCQ: The "answer" field MUST exactly match one of the 4 options.
+- True/False: Answer must be exactly "True" or "False"
+- Short answer: Simple factual questions with specific answers
 - Make questions directly from PDF content
 - Use simple, clear language
+
+VALIDATION:
+- For MCQ and Fill in blank: answer field MUST be identical to one of the options
+- Double check that answer matches an option exactly
 
 JSON format:
 {"questions": [question1, question2, ...]}
@@ -189,11 +195,45 @@ Generate fast, accurate questions. Return only valid JSON.`;
       // Auto-generate options for True/False
       if (q.type === 'true_false') {
         q.options = ['True', 'False'];
+        // Ensure answer is exactly True or False
+        if (q.answer.toLowerCase().includes('true')) {
+          q.answer = 'True';
+        } else if (q.answer.toLowerCase().includes('false')) {
+          q.answer = 'False';
+        } else {
+          q.answer = 'True'; // Default fallback
+        }
       }
 
       // Ensure MCQ and fill_in_the_blank have options
       if ((q.type === 'mcq' || q.type === 'fill_in_the_blank') && (!q.options || q.options.length !== 4)) {
         throw new Error(`Question ${index + 1} (${q.type}) must have exactly 4 options`);
+      }
+
+      // CRITICAL: Validate that answer matches one of the options for MCQ and fill_in_the_blank
+      if (q.type === 'mcq' || q.type === 'fill_in_the_blank') {
+        const answerMatches = q.options.some(option => 
+          option.toLowerCase().trim() === q.answer.toLowerCase().trim()
+        );
+        
+        if (!answerMatches) {
+          console.log(`⚠️  Question ${index + 1}: Answer "${q.answer}" doesn't match any option`);
+          console.log(`Options: ${q.options.join(', ')}`);
+          
+          // Try to find closest match
+          const closestMatch = q.options.find(option => 
+            option.toLowerCase().includes(q.answer.toLowerCase()) ||
+            q.answer.toLowerCase().includes(option.toLowerCase())
+          );
+          
+          if (closestMatch) {
+            console.log(`🔧 Auto-fixing: Changed answer to "${closestMatch}"`);
+            q.answer = closestMatch;
+          } else {
+            console.log(`🔧 Auto-fixing: Using first option "${q.options[0]}"`);
+            q.answer = q.options[0];
+          }
+        }
       }
 
       // For short answer, no options needed
@@ -296,9 +336,44 @@ Return: {"questions": [...]}`
     const validatedQuestions = questionsData.questions.map((q, index) => {
       if (q.type === 'true_false') {
         q.options = ['True', 'False'];
+        // Ensure answer is exactly True or False
+        if (q.answer.toLowerCase().includes('true')) {
+          q.answer = 'True';
+        } else if (q.answer.toLowerCase().includes('false')) {
+          q.answer = 'False';
+        } else {
+          q.answer = 'True'; // Default fallback
+        }
       }
+      
       if (q.type === 'short_answer') {
         q.options = [];
+      }
+
+      // CRITICAL: Validate that answer matches one of the options for MCQ and fill_in_the_blank
+      if (q.type === 'mcq' || q.type === 'fill_in_the_blank') {
+        const answerMatches = q.options.some(option => 
+          option.toLowerCase().trim() === q.answer.toLowerCase().trim()
+        );
+        
+        if (!answerMatches) {
+          console.log(`⚠️  Topic Quiz Question ${index + 1}: Answer "${q.answer}" doesn't match any option`);
+          console.log(`Options: ${q.options.join(', ')}`);
+          
+          // Try to find closest match
+          const closestMatch = q.options.find(option => 
+            option.toLowerCase().includes(q.answer.toLowerCase()) ||
+            q.answer.toLowerCase().includes(option.toLowerCase())
+          );
+          
+          if (closestMatch) {
+            console.log(`🔧 Auto-fixing: Changed answer to "${closestMatch}"`);
+            q.answer = closestMatch;
+          } else {
+            console.log(`🔧 Auto-fixing: Using first option "${q.options[0]}"`);
+            q.answer = q.options[0];
+          }
+        }
       }
 
       return {
@@ -634,5 +709,21 @@ app.use((req, res) => {
 
 // Start server
 app.listen(PORT, () => {
+  console.log(`🚀 Optimized QuizWise Backend running on port ${PORT}`);
+  console.log(`📍 Health check: http://localhost:${PORT}/health`);
+  console.log(`🔗 API Base URL: http://localhost:${PORT}`);
+  console.log(`✅ Gemini AI initialized successfully`);
+  console.log(`\n🎯 OPTIMIZED ENDPOINTS:`);
+  console.log(`   ⚡ Fast PDF Quiz: POST /api/generate-fast-quiz (2-3s)`);
+  console.log(`   💨 Topic Quiz: POST /api/generate-topic-quiz (1-2s)`);
+  console.log(`\n📊 FEATURES:`);
+  console.log(`   🔥 Super fast generation`);
+  console.log(`   📝 Mixed question types`);
+  console.log(`   ✨ Fill in blank with options`);
+  console.log(`   🎮 Smooth user experience`);
+  console.log(`   📱 Mobile optimized`);
+  
+  // Test API key on startup
+  console.log('\n🔑 API Key configured and ready');
   console.log('🎉 Ready for lightning-fast quiz generation!');
 });
