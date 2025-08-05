@@ -711,17 +711,7 @@ app.use((req, res) => {
 app.listen(PORT, () => {
   console.log(`🚀 Optimized QuizWise Backend running on port ${PORT}`);
   console.log(`📍 Health check: http://localhost:${PORT}/health`);
-  console.log(`🔗 API Base URL: http://localhost:${PORT}`);
-  console.log(`✅ Gemini AI initialized successfully`);
-  console.log(`\n🎯 OPTIMIZED ENDPOINTS:`);
-  console.log(`   ⚡ Fast PDF Quiz: POST /api/generate-fast-quiz (2-3s)`);
-  console.log(`   💨 Topic Quiz: POST /api/generate-topic-quiz (1-2s)`);
-  console.log(`\n📊 FEATURES:`);
-  console.log(`   🔥 Super fast generation`);
-  console.log(`   📝 Mixed question types`);
-  console.log(`   ✨ Fill in blank with options`);
-  console.log(`   🎮 Smooth user experience`);
-  console.log(`   📱 Mobile optimized`);
+
   
   // Test API key on startup
   console.log('\n🔑 API Key configured and ready');
